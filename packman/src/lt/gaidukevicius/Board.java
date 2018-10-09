@@ -31,18 +31,18 @@ public class Board extends JPanel implements ActionListener {
     private boolean inGame = false;
     private boolean dying = false;
 
-    private final int BLOCK_SIZE = 24;
-    private final int N_BLOCKS = 15;
+    private final int BLOCK_SIZE = 24; //buvo 24
+    private final int N_BLOCKS = 15; //buvo 15
     private final int SCREEN_SIZE = N_BLOCKS * BLOCK_SIZE;
-    private final int PAC_ANIM_DELAY = 2;
-    private final int PACMAN_ANIM_COUNT = 4;
+    private final int PAC_ANIM_DELAY = 4; //buvo 2
+    private final int PACMAN_ANIM_COUNT = 5;//buvo 4
     private final int MAX_GHOSTS = 12;
     private final int PACMAN_SPEED = 6;
 
     private int pacAnimCount = PAC_ANIM_DELAY;
     private int pacAnimDir = 1;
     private int pacmanAnimPos = 0;
-    private int N_GHOSTS = 6;
+    private int N_GHOSTS = 1; //buvo 6
     private int pacsLeft, score;
     private int[] dx, dy;
     private int[] ghost_x, ghost_y, ghost_dx, ghost_dy, ghostSpeed;
@@ -524,20 +524,20 @@ public class Board extends JPanel implements ActionListener {
 
     private void loadImages() {
 
-        ghost = new ImageIcon("images/ghost.png").getImage();
-        pacman1 = new ImageIcon("images/pacman.png").getImage();
-        pacman2up = new ImageIcon("images/up1.png").getImage();
-        pacman3up = new ImageIcon("images/up2.png").getImage();
-        pacman4up = new ImageIcon("images/up3.png").getImage();
-        pacman2down = new ImageIcon("images/down1.png").getImage();
-        pacman3down = new ImageIcon("images/down2.png").getImage();
-        pacman4down = new ImageIcon("images/down3.png").getImage();
-        pacman2left = new ImageIcon("images/left1.png").getImage();
-        pacman3left = new ImageIcon("images/left2.png").getImage();
-        pacman4left = new ImageIcon("images/left3.png").getImage();
-        pacman2right = new ImageIcon("images/right1.png").getImage();
-        pacman3right = new ImageIcon("images/right2.png").getImage();
-        pacman4right = new ImageIcon("images/right3.png").getImage();
+        ghost = new ImageIcon("images/ghost.gif").getImage();
+        pacman1 = new ImageIcon("images/pacman.gif").getImage();
+        pacman2up = new ImageIcon("images/up1.gif").getImage();
+        pacman3up = new ImageIcon("images/up2.gif").getImage();
+        pacman4up = new ImageIcon("images/up3.gif").getImage();
+        pacman2down = new ImageIcon("images/down1.gif").getImage();
+        pacman3down = new ImageIcon("images/down2.gif").getImage();
+        pacman4down = new ImageIcon("images/down3.gif").getImage();
+        pacman2left = new ImageIcon("images/left1.gif").getImage();
+        pacman3left = new ImageIcon("images/left2.gif").getImage();
+        pacman4left = new ImageIcon("images/left3.gif").getImage();
+        pacman2right = new ImageIcon("images/right1.gif").getImage();
+        pacman3right = new ImageIcon("images/right2.gif").getImage();
+        pacman4right = new ImageIcon("images/right3.gif").getImage();
 
     }
 
