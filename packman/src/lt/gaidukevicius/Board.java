@@ -55,8 +55,9 @@ public class Board extends JPanel implements ActionListener {
     private int pacman_x, pacman_y, pacmand_x, pacmand_y;
     private int req_dx, req_dy, view_dx, view_dy;
 
+ 
     private final short levelData[] = {
-        19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22,
+        3, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22,
         21, 0, 0, 0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
         21, 0, 0, 0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
         21, 0, 0, 0, 17, 16, 16, 24, 16, 16, 16, 16, 16, 16, 20,
@@ -72,6 +73,29 @@ public class Board extends JPanel implements ActionListener {
         1, 25, 24, 24, 24, 24, 24, 24, 24, 24, 16, 16, 16, 18, 20,
         9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 25, 24, 24, 24, 28
     };
+
+    /*private final short levelData[] = {
+    		19,26,26,22, 9,12,19,26,22, 9,12,19,26,26,22,
+    		37,11,14,17,26,26,20,15,17,26,26,20,11,14,37,
+    		17,26,26,20,11, 6,17,26,20, 3,14,17,26,26,20,
+    		21, 3, 6,25,22, 5,21, 7,21, 5,19,28, 3, 6,21,
+    		21, 9, 8,14,21,13,21, 5,21,13,21,11, 8,12,21,
+    		25,18,26,18,24,18,28, 5,25,18,24,18,26,18,28,
+    		 6,21, 7,21, 7,21,11, 8,14,21, 7,21, 7,21,03,
+    		 4,21, 5,21, 5,21,11,10,14,21, 5,21, 5,21, 1,
+    		12,21,13,21,13,21,11,10,14,21,13,21,13,21, 9,
+    		19,24,26,24,26,16,26,18,26,16,26,24,26,24,22,
+    		21, 3, 2, 2, 6,21,15,21,15,21, 3, 2, 2,06,21,
+    		21, 9, 8, 8, 4,17,26, 8,26,20, 1, 8, 8,12,21,
+    		17,26,26,22,13,21,11, 2,14,21,13,19,26,26,20,
+    		37,11,14,17,26,24,22,13,19,24,26,20,11,14,37,
+    		25,26,26,28, 3, 6,25,26,28, 3, 6,25,26,26,28 
+        };*/
+
+
+
+
+
 
     private final int validSpeeds[] = {1, 2, 3, 4, 6, 8};
     private final int maxSpeed = 6;
@@ -99,6 +123,8 @@ public class Board extends JPanel implements ActionListener {
 
     private void initVariables() {
 
+    	
+    	//kaip cia aprasomi kintamieji? Koks tai tipas?
         screenData = new short[N_BLOCKS * N_BLOCKS];
         mazeColor = new Color(5, 100, 5);
         d = new Dimension(400, 400);
@@ -475,8 +501,8 @@ public class Board extends JPanel implements ActionListener {
         pacsLeft = 3;
         score = 0;
         initLevel();
-        N_GHOSTS = 6;
-        currentSpeed = 3;
+        N_GHOSTS = 1;  //buvo 6// cia nusistato vaiduokliu skaicius
+        currentSpeed = 3; // buvo 3 // cia nusistaot greitis
     }
 
     private void initLevel() {
