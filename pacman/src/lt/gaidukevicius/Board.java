@@ -14,10 +14,21 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+
+//importuoju 3 bibliotekas garsui groti
+import java.applet.Applet;
+import java.applet.AudioClip;
+import java.net.URL;
+
+import java.util.Scanner;
+
 
 public class Board extends JPanel implements ActionListener {
 
@@ -55,9 +66,10 @@ public class Board extends JPanel implements ActionListener {
     private int pacman_x, pacman_y, pacmand_x, pacmand_y;
     private int req_dx, req_dy, view_dx, view_dy;
 
- 
-    private final short levelData[] = {
-        3, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22,
+    private short[] levelData = new short[225];
+   
+   /* private final short levelData[] = {
+        19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 16, 16, 16, 16, 20,
         21, 0, 0, 0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
         21, 0, 0, 0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
         21, 0, 0, 0, 17, 16, 16, 24, 16, 16, 16, 16, 16, 16, 20,
@@ -71,8 +83,8 @@ public class Board extends JPanel implements ActionListener {
         1, 17, 16, 16, 16, 16, 16, 18, 16, 16, 16, 16, 20, 0, 21,
         1, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20, 0, 21,
         1, 25, 24, 24, 24, 24, 24, 24, 24, 24, 16, 16, 16, 18, 20,
-        9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 25, 24, 24, 24, 28
-    };
+        9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 17, 16, 16, 16, 20
+    };*/
 
     /*private final short levelData[] = {
     		19,26,26,22, 9,12,19,26,22, 9,12,19,26,26,22,
@@ -105,7 +117,11 @@ public class Board extends JPanel implements ActionListener {
     private Timer timer;
 
     public Board() {
-
+    	
+    	//labirinto nuskaitymas
+    	//levelData = nuskaitauLabirinta();
+        //System.out.println(levelData[0] + " " + levelData[1]); //Testuoju
+    	
         loadImages();
         initVariables();
         initBoard();
@@ -196,16 +212,28 @@ public class Board extends JPanel implements ActionListener {
 
         int i;
         String s;
-
+        String t;
         g.setFont(smallFont);
         g.setColor(new Color(96, 128, 255));
         s = "Score: " + score;
+        t = "Timer: ";
         g.drawString(s, SCREEN_SIZE / 2 + 96, SCREEN_SIZE + 16);
-
+        g.drawString(t, SCREEN_SIZE / 2 - 60, SCREEN_SIZE + 16);
         for (i = 0; i < pacsLeft; i++) {
             g.drawImage(pacman3left, i * 28 + 8, SCREEN_SIZE + 1, this);
         }
     }
+    
+    /*private void drawTimer(Graphics2D g) {
+    	 String t; // timer eilutes kintamasis
+    	 t = "Timer: " + timer;
+    	 
+    	 g.setFont(smallFont);
+         g.setColor(new Color(96, 128, 255));
+    	 g.drawString(t, SCREEN_SIZE - 100, SCREEN_SIZE + 16);
+    }*/
+      
+    
 
     private void checkMaze() {
 
@@ -238,11 +266,13 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void death() {
-
+    	 File mirtis = new File("sounds/pacman_death.wav");
         pacsLeft--;
 
         if (pacsLeft == 0) {
             inGame = false;
+            playSound(mirtis, 1000);
+            
         }
 
         continueLevel();
@@ -308,8 +338,16 @@ public class Board extends JPanel implements ActionListener {
 
             }
 
-            ghost_x[i] = ghost_x[i] + (ghost_dx[i] * ghostSpeed[i]);
+            ghost_x[i] = ghost_x[i] + (ghost_dx[i] * ghostSpeed[i]); // matyt cia naujos vaiduoklio koordinates nustatomos
             ghost_y[i] = ghost_y[i] + (ghost_dy[i] * ghostSpeed[i]);
+            
+            //patikrinu ar neperlipo virsutines ir apatines ribos
+            if(ghost_y[i] > 336) {
+            	ghost_y[i] = 336;
+            }
+            if(ghost_y[i] < 0) {
+            	ghost_y[i] = 0;
+            }
             drawGhost(g2d, ghost_x[i] + 1, ghost_y[i] + 1);
 
             if (pacman_x > (ghost_x[i] - 12) && pacman_x < (ghost_x[i] + 12)
@@ -330,6 +368,10 @@ public class Board extends JPanel implements ActionListener {
 
         int pos;
         short ch;
+        
+        //mano prideta garso saltinis
+        File valgau = new File("sounds/pacman_chomp.wav");
+		
 
         if (req_dx == -pacmand_x && req_dy == -pacmand_y) {
             pacmand_x = req_dx;
@@ -339,11 +381,13 @@ public class Board extends JPanel implements ActionListener {
         }
 
         if (pacman_x % BLOCK_SIZE == 0 && pacman_y % BLOCK_SIZE == 0) {
-            pos = pacman_x / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y / BLOCK_SIZE);
+            pos = pacman_x / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y / BLOCK_SIZE); //panasu, kad cia apsiskaiciuoj kita pacmano pozicija
             ch = screenData[pos];
-
+            
+            //atrodo, kad cia valgomi taskai
             if ((ch & 16) != 0) {
                 screenData[pos] = (short) (ch & 15);
+                playSound(valgau, 20000); // cia sugroja muzikyte, kai suvalgo taska
                 score++;
             }
 
@@ -359,7 +403,7 @@ public class Board extends JPanel implements ActionListener {
                 }
             }
 
-            // Check for standstill
+            // Check for standstill  // cia patikrinama ar yra kur eiti (ar nera sienos)
             if ((pacmand_x == -1 && pacmand_y == 0 && (ch & 1) != 0)
                     || (pacmand_x == 1 && pacmand_y == 0 && (ch & 4) != 0)
                     || (pacmand_x == 0 && pacmand_y == -1 && (ch & 2) != 0)
@@ -368,8 +412,16 @@ public class Board extends JPanel implements ActionListener {
                 pacmand_y = 0;
             }
         }
-        pacman_x = pacman_x + PACMAN_SPEED * pacmand_x;
-        pacman_y = pacman_y + PACMAN_SPEED * pacmand_y;
+        pacman_x = pacman_x + PACMAN_SPEED * pacmand_x;  //gali buti, kad cia nustatomos naujos pacmano koordinates, i kurias
+        pacman_y = pacman_y + PACMAN_SPEED * pacmand_y;	 // jis turi nueiti
+        //System.out.println("pacman_x yra: " + pacman_x);
+        
+        //cia paziurima ar isejo per virsutine ar apatine ribas.
+        if(pacman_y < 0) {
+        	pacman_y = 336;
+        } else if(pacman_y > 336) {
+        	pacman_y = 0;
+        }
     }
 
     private void drawPacman(Graphics2D g2d) {
@@ -498,15 +550,15 @@ public class Board extends JPanel implements ActionListener {
 
     private void initGame() {
 
-        pacsLeft = 3;
+        pacsLeft = 1; // cia nusistato packamnu skaicius
         score = 0;
         initLevel();
-        N_GHOSTS = 1;  //buvo 6// cia nusistato vaiduokliu skaicius
+        N_GHOSTS = 2;  //buvo 6// cia nusistato vaiduokliu skaicius
         currentSpeed = 3; // buvo 3 // cia nusistaot greitis
     }
 
     private void initLevel() {
-
+    	levelData = nuskaitauLabirinta();
         int i;
         for (i = 0; i < N_BLOCKS * N_BLOCKS; i++) {
             screenData[i] = levelData[i];
@@ -576,7 +628,7 @@ public class Board extends JPanel implements ActionListener {
 
     private void doDrawing(Graphics g) {
 
-        Graphics2D g2d = (Graphics2D) g;
+        Graphics2D g2d = (Graphics2D) g;            // kaip suprasti sita eilute?
 
         g2d.setColor(Color.black);
         g2d.fillRect(0, 0, d.width, d.height);
@@ -651,4 +703,47 @@ public class Board extends JPanel implements ActionListener {
 
         repaint();
     }
-}
+    
+    //----------------------mano papildomi metodai
+    
+    //garsu grojimas
+    
+    public void playSound(File garsas, int pauze) {
+		try {
+			Clip clip = AudioSystem.getClip();
+			clip.open(AudioSystem.getAudioInputStream(garsas));
+			clip.start();
+			Thread.sleep(clip.getMicrosecondLength() / pauze);
+			clip.stop();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+    
+    //Failo su labirintu nuskaitymas
+    
+    public short[] nuskaitauLabirinta() {
+    	File failas = new File("maps/level_01.txt");
+        //String eilute = "";
+        short[] labirintas = new short[225];
+    	try {
+        	Scanner input = new Scanner(failas);
+        	for(int i = 0; i <= 224; i++) {
+        		labirintas[i] = input.nextByte();
+        	}
+        	input.close();
+        	
+        	        	
+        	/*while(input.hasNextLine()){
+        		eilute = input.nextLine();
+        		input.nextByte();
+        		input.close();
+        	}*/
+        } catch (Exception e) {
+        		e.printStackTrace();
+        }
+		return labirintas;
+    }
+    
+    
+} 
