@@ -123,7 +123,8 @@ public class Board extends JPanel implements ActionListener {
     private long superTimer; //Skaiciuoja kiek laiko yra aktyvuotos super galios. Limitas 10 sekundziu
     
     private long timeStarted; // paimu atskaitos taska, kada prasidejo zaidimas
-    SimpleDateFormat timeForDisplay = new SimpleDateFormat("mm:ss");
+    private SimpleDateFormat timeForDisplay = new SimpleDateFormat("mm:ss");
+    private boolean arPrasidejoZaidimas;
     
     private int ghost_active []; //0 - jeigu vaiduoklis suvalgytas, 1 - jeigu vaiduoklis aktyvus
     
@@ -235,7 +236,10 @@ public class Board extends JPanel implements ActionListener {
         s = "Score: " + score;
         //System.out.println("Ar jis visa laika spausdina taskus ar tik tada, kai atsinaujina?"); - visa laika
         tf = timeForDisplay.format(System.currentTimeMillis() - timeStarted);
-        t = "Timer: " + tf;
+        t = "Timer: ";
+        if(arPrasidejoZaidimas) {
+        	t += tf;
+        }
         g.drawString(s, SCREEN_SIZE / 2 + 96, SCREEN_SIZE + 16);
         g.drawString(t, SCREEN_SIZE / 2 - 60, SCREEN_SIZE + 16);
         for (i = 0; i < pacsLeft; i++) {
@@ -292,6 +296,7 @@ public class Board extends JPanel implements ActionListener {
         if (pacsLeft == 0) {
             inGame = false;
             playSound(mirtis, 1000);
+            arPrasidejoZaidimas = false;
             
         }
 
@@ -361,7 +366,7 @@ public class Board extends JPanel implements ActionListener {
             ghost_x[i] = ghost_x[i] + (ghost_dx[i] * ghostSpeed[i]); // matyt cia naujos vaiduoklio koordinates nustatomos
             ghost_y[i] = ghost_y[i] + (ghost_dy[i] * ghostSpeed[i]);
             
-            //patikrinu ar neperlipo virsutines ir apatines ribos
+            //patikrinu ar neperlipo virsutines ar apatines ribos
             if(ghost_y[i] > 336) {
             	ghost_y[i] = 336;
             }
@@ -386,15 +391,12 @@ public class Board extends JPanel implements ActionListener {
 
                     if(superPower == 0) {
                     	dying = true;
+                    
                     } else {
                     	ghost_active[i] = 0;
-                    }
-            		
+                    } 		
                 }
             }
-            
-            
-            
         }
     }
 
@@ -461,6 +463,20 @@ public class Board extends JPanel implements ActionListener {
         } else if(pacman_y > 336) {
         	pacman_y = 0;
         }
+        
+        //cia paziurima ar isejo per desini sona
+        if(pacman_x > 336) {
+        	//kol kas padarau, kad atsoktu per viena langeli
+        	//pacman_x = 336 - 24;
+        	
+        	pacman_x = 0;
+        	//turetu cia dabar uzkrauti nauja labirinta
+        	//initLevel() netinka, nes ten suteikia pradines pacmano koordinates
+        	//reikia savo initLeve() funkcijos
+        	initLevel();
+        }
+        
+        
         //Tikrinu ar jau praejo laiko, kad isjungti super Power rezima
         if(System.currentTimeMillis() - superTimer > 10000) {
         	superPower = 0;
@@ -594,7 +610,7 @@ public class Board extends JPanel implements ActionListener {
 
     private void initGame() {
 
-        pacsLeft = 1; // cia nusistato packamnu skaicius
+        pacsLeft = 2; // cia nusistato packamnu skaicius
         score = 0;
         initLevel();
         N_GHOSTS = 2;  //buvo 6// cia nusistato vaiduokliu skaicius
@@ -617,7 +633,7 @@ public class Board extends JPanel implements ActionListener {
         short i;
         int dx = 1;
         int random;
-        timeStarted = System.currentTimeMillis(); // cia uzfiksavau, kada prasideda laiko atskaita
+        //timeStarted = System.currentTimeMillis(); // cia uzfiksavau, kada prasideda laiko atskaita
         
         for (i = 0; i < N_GHOSTS; i++) {
 
@@ -732,6 +748,8 @@ public class Board extends JPanel implements ActionListener {
             } else {
                 if (key == 's' || key == 'S') {
                     inGame = true;
+                    arPrasidejoZaidimas = true;
+                    timeStarted = System.currentTimeMillis();
                     initGame();
                 }
             }
