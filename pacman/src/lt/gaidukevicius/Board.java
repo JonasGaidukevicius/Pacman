@@ -27,6 +27,8 @@ import java.applet.Applet;
 import java.applet.AudioClip;
 import java.net.URL;
 
+//1 biblioteka laiko atvaizdavimui pagal formata
+import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
 
@@ -57,6 +59,7 @@ public class Board extends JPanel implements ActionListener {
     private int pacsLeft, score;
     private int[] dx, dy;
     private int[] ghost_x, ghost_y, ghost_dx, ghost_dy, ghostSpeed;
+    
 
     private Image ghost;
     private Image pacman1, pacman2up, pacman2left, pacman2right, pacman2down;
@@ -65,7 +68,7 @@ public class Board extends JPanel implements ActionListener {
 
     private int pacman_x, pacman_y, pacmand_x, pacmand_y;
     private int req_dx, req_dy, view_dx, view_dy;
-
+    
     private short[] levelData = new short[225];
    
    /* private final short levelData[] = {
@@ -115,7 +118,15 @@ public class Board extends JPanel implements ActionListener {
     private int currentSpeed = 3;
     private short[] screenData;
     private Timer timer;
-
+    
+    private int superPower; //Jeigu 0 - iprastas, heigu 1 - valgo vaiduoklius
+    private long superTimer; //Skaiciuoja kiek laiko yra aktyvuotos super galios. Limitas 10 sekundziu
+    
+    private long timeStarted; // paimu atskaitos taska, kada prasidejo zaidimas
+    SimpleDateFormat timeForDisplay = new SimpleDateFormat("mm:ss");
+    
+    private int ghost_active []; //0 - jeigu vaiduoklis suvalgytas, 1 - jeigu vaiduoklis aktyvus
+    
     public Board() {
     	
     	//labirinto nuskaitymas
@@ -149,11 +160,16 @@ public class Board extends JPanel implements ActionListener {
         ghost_y = new int[MAX_GHOSTS];
         ghost_dy = new int[MAX_GHOSTS];
         ghostSpeed = new int[MAX_GHOSTS];
+        ghost_active = new int[MAX_GHOSTS]; //mano kintamasis ar vaiduoklis aktyvus
         dx = new int[4];
         dy = new int[4];
         
         timer = new Timer(40, this);
         timer.start();
+        superPower = 0;
+        superTimer = 0;
+       
+        timeForDisplay = new SimpleDateFormat("mm:ss");
     }
 
     @Override
@@ -199,7 +215,7 @@ public class Board extends JPanel implements ActionListener {
         g2d.setColor(Color.white);
         g2d.drawRect(50, SCREEN_SIZE / 2 - 30, SCREEN_SIZE - 100, 50);
 
-        String s = "Press s to start.";
+        String s = "Paspausk s, kad pradeti.";
         Font small = new Font("Helvetica", Font.BOLD, 14);
         FontMetrics metr = this.getFontMetrics(small);
 
@@ -213,10 +229,13 @@ public class Board extends JPanel implements ActionListener {
         int i;
         String s;
         String t;
+        String tf; //time formated
         g.setFont(smallFont);
         g.setColor(new Color(96, 128, 255));
         s = "Score: " + score;
-        t = "Timer: ";
+        //System.out.println("Ar jis visa laika spausdina taskus ar tik tada, kai atsinaujina?"); - visa laika
+        tf = timeForDisplay.format(System.currentTimeMillis() - timeStarted);
+        t = "Timer: " + tf;
         g.drawString(s, SCREEN_SIZE / 2 + 96, SCREEN_SIZE + 16);
         g.drawString(t, SCREEN_SIZE / 2 - 60, SCREEN_SIZE + 16);
         for (i = 0; i < pacsLeft; i++) {
@@ -241,7 +260,8 @@ public class Board extends JPanel implements ActionListener {
         boolean finished = true;
 
         while (i < N_BLOCKS * N_BLOCKS && finished) {
-
+        	
+        	//cia pertikrina ar dar like yra tasku nesuvalgytu
             if ((screenData[i] & 48) != 0) {
                 finished = false;
             }
@@ -348,14 +368,33 @@ public class Board extends JPanel implements ActionListener {
             if(ghost_y[i] < 0) {
             	ghost_y[i] = 0;
             }
-            drawGhost(g2d, ghost_x[i] + 1, ghost_y[i] + 1);
-
-            if (pacman_x > (ghost_x[i] - 12) && pacman_x < (ghost_x[i] + 12)
-                    && pacman_y > (ghost_y[i] - 12) && pacman_y < (ghost_y[i] + 12)
-                    && inGame) {
-
-                dying = true;
+            
+            //cia piesia vaiduokli
+            //tai reikia nekviesti sio metodo, jeigu vaiduoklis suvalgytas
+            
+            if(ghost_active[i] != 0) {
+            	drawGhost(g2d, ghost_x[i] + 1, ghost_y[i] + 1);
             }
+            
+            
+            //cia patikrina ar susidure vaiduoklis su pacmanu
+            
+            if(ghost_active[i] != 0) {
+            	if (pacman_x > (ghost_x[i] - 12) && pacman_x < (ghost_x[i] + 12)
+                        && pacman_y > (ghost_y[i] - 12) && pacman_y < (ghost_y[i] + 12)
+                        && inGame) {
+
+                    if(superPower == 0) {
+                    	dying = true;
+                    } else {
+                    	ghost_active[i] = 0;
+                    }
+            		
+                }
+            }
+            
+            
+            
         }
     }
 
@@ -421,6 +460,11 @@ public class Board extends JPanel implements ActionListener {
         	pacman_y = 336;
         } else if(pacman_y > 336) {
         	pacman_y = 0;
+        }
+        //Tikrinu ar jau praejo laiko, kad isjungti super Power rezima
+        if(System.currentTimeMillis() - superTimer > 10000) {
+        	superPower = 0;
+        	superTimer = 0;
         }
     }
 
@@ -555,6 +599,7 @@ public class Board extends JPanel implements ActionListener {
         initLevel();
         N_GHOSTS = 2;  //buvo 6// cia nusistato vaiduokliu skaicius
         currentSpeed = 3; // buvo 3 // cia nusistaot greitis
+        
     }
 
     private void initLevel() {
@@ -572,13 +617,15 @@ public class Board extends JPanel implements ActionListener {
         short i;
         int dx = 1;
         int random;
-
+        timeStarted = System.currentTimeMillis(); // cia uzfiksavau, kada prasideda laiko atskaita
+        
         for (i = 0; i < N_GHOSTS; i++) {
 
             ghost_y[i] = 4 * BLOCK_SIZE;
             ghost_x[i] = 4 * BLOCK_SIZE;
             ghost_dy[i] = 0;
             ghost_dx[i] = dx;
+            ghost_active[i] = 1; //cia nustatau, kad nauji vaiduokliai visi akvyvus
             dx = -dx;
             random = (int) (Math.random() * (currentSpeed + 1));
 
@@ -676,6 +723,11 @@ public class Board extends JPanel implements ActionListener {
                     } else {
                         timer.start();
                     }
+                } else if(key == KeyEvent.VK_SPACE) {
+                	//Cia darosi pacmanas valgantis vaiduoklius
+                	superPower = 1;
+                	superTimer = System.currentTimeMillis();
+                	
                 }
             } else {
                 if (key == 's' || key == 'S') {
