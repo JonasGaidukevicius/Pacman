@@ -20,6 +20,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 //importuoju 3 bibliotekas garsui groti
@@ -65,6 +66,11 @@ public class Board extends JPanel implements ActionListener {
     private Image pacman1, pacman2up, pacman2left, pacman2right, pacman2down;
     private Image pacman3up, pacman3down, pacman3left, pacman3right;
     private Image pacman4up, pacman4down, pacman4left, pacman4right;
+    
+    //raudonas pacmanas
+    private Image pacman1_r, pacman2up_r, pacman2left_r, pacman2right_r, pacman2down_r;
+    private Image pacman3up_r, pacman3down_r, pacman3left_r, pacman3right_r;
+    private Image pacman4up_r, pacman4down_r, pacman4left_r, pacman4right_r;
 
     private int pacman_x, pacman_y, pacmand_x, pacmand_y;
     private int req_dx, req_dy, view_dx, view_dy;
@@ -679,6 +685,22 @@ public class Board extends JPanel implements ActionListener {
         pacman2right = new ImageIcon("images/right1.gif").getImage();
         pacman3right = new ImageIcon("images/right2.gif").getImage();
         pacman4right = new ImageIcon("images/right3.gif").getImage();
+        
+        //raudonas pacmanas - kai valgo vaiduoklius
+        pacman1_r = new ImageIcon("images/pacman_r.gif").getImage();
+        pacman2up_r = new ImageIcon("images/up1_r.gif").getImage();
+        pacman3up_r = new ImageIcon("images/up2_r.gif").getImage();
+        pacman4up_r = new ImageIcon("images/up3_r.gif").getImage();
+        pacman2down_r = new ImageIcon("images/down1_r.gif").getImage();
+        pacman3down_r = new ImageIcon("images/down2_r.gif").getImage();
+        pacman4down_r = new ImageIcon("images/down3_r.gif").getImage();
+        pacman2left_r = new ImageIcon("images/left1_r.gif").getImage();
+        pacman3left_r = new ImageIcon("images/left2_r.gif").getImage();
+        pacman4left_r = new ImageIcon("images/left3_r.gif").getImage();
+        pacman2right_r = new ImageIcon("images/right1_r.gif").getImage();
+        pacman3right_r = new ImageIcon("images/right2_r.gif").getImage();
+        pacman4right_r = new ImageIcon("images/right3_r.gif").getImage();
+        
 
     }
 
@@ -751,6 +773,22 @@ public class Board extends JPanel implements ActionListener {
                     arPrasidejoZaidimas = true;
                     timeStarted = System.currentTimeMillis();
                     initGame();
+                } else if(key == 'r' || key == 'R') {
+                	//buvo taip:
+                	//new Labirintas().labirintoRedagavimas();
+                	
+                	//cia naujas **************************
+                	SwingUtilities.invokeLater(new Runnable() {
+
+            			@Override
+            			public void run() {
+            				new Labirintas();
+            				
+            			}
+            			
+            		});
+            		
+                	//************************************
                 }
             }
         }
