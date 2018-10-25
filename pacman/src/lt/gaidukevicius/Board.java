@@ -134,6 +134,8 @@ public class Board extends JPanel implements ActionListener {
     
     private int ghost_active []; //0 - jeigu vaiduoklis suvalgytas, 1 - jeigu vaiduoklis aktyvus
     
+    private boolean isejoPerDesine = false;
+    private boolean isejoPerKaire = false;
     public Board() {
     	
     	//labirinto nuskaitymas
@@ -218,17 +220,21 @@ public class Board extends JPanel implements ActionListener {
     private void showIntroScreen(Graphics2D g2d) {
 
         g2d.setColor(new Color(0, 32, 48));
-        g2d.fillRect(50, SCREEN_SIZE / 2 - 30, SCREEN_SIZE - 100, 50);
+        g2d.fillRect(50, SCREEN_SIZE / 2 - 60, SCREEN_SIZE - 100, 100);
         g2d.setColor(Color.white);
-        g2d.drawRect(50, SCREEN_SIZE / 2 - 30, SCREEN_SIZE - 100, 50);
+        g2d.drawRect(50, SCREEN_SIZE / 2 - 60, SCREEN_SIZE - 100, 100);
 
-        String s = "Paspausk s, kad pradeti.";
+        String s = "Paspausk s, kad zaisti.";
+        String c = "Paspausk c, kad zaisti savo labirinte.";
+        String r = "Paspausk r, kad redaguoti.";
         Font small = new Font("Helvetica", Font.BOLD, 14);
         FontMetrics metr = this.getFontMetrics(small);
 
         g2d.setColor(Color.white);
         g2d.setFont(small);
-        g2d.drawString(s, (SCREEN_SIZE - metr.stringWidth(s)) / 2, SCREEN_SIZE / 2);
+        g2d.drawString(s, (SCREEN_SIZE - metr.stringWidth(s)) / 2, SCREEN_SIZE / 2 - 30);
+        g2d.drawString(c, (SCREEN_SIZE - metr.stringWidth(c)) / 2, SCREEN_SIZE / 2 - 10);
+        g2d.drawString(r, (SCREEN_SIZE - metr.stringWidth(r)) / 2, SCREEN_SIZE / 2 + 10);
     }
 
     private void drawScore(Graphics2D g) {
@@ -478,7 +484,8 @@ public class Board extends JPanel implements ActionListener {
         	pacman_x = 0;
         	//turetu cia dabar uzkrauti nauja labirinta
         	//initLevel() netinka, nes ten suteikia pradines pacmano koordinates
-        	//reikia savo initLeve() funkcijos
+        	//reikia savo initLevel() funkcijos
+        	isejoPerDesine = true;
         	initLevel();
         }
         
@@ -507,16 +514,33 @@ public class Board extends JPanel implements ActionListener {
 
         switch (pacmanAnimPos) {
             case 1:
-                g2d.drawImage(pacman2up, pacman_x + 1, pacman_y + 1, this);
+                if(superPower == 0) {
+                	g2d.drawImage(pacman2up, pacman_x + 1, pacman_y + 1, this);
+                } else {
+                	g2d.drawImage(pacman2up_r, pacman_x + 1, pacman_y + 1, this);
+                }
                 break;
             case 2:
-                g2d.drawImage(pacman3up, pacman_x + 1, pacman_y + 1, this);
+            	if(superPower == 0) {
+            		g2d.drawImage(pacman3up, pacman_x + 1, pacman_y + 1, this);
+            	} else {
+            		g2d.drawImage(pacman3up_r, pacman_x + 1, pacman_y + 1, this);
+            	}
                 break;
             case 3:
-                g2d.drawImage(pacman4up, pacman_x + 1, pacman_y + 1, this);
+                if(superPower == 0) {
+                	g2d.drawImage(pacman4up, pacman_x + 1, pacman_y + 1, this);
+                } else {
+                	g2d.drawImage(pacman4up_r, pacman_x + 1, pacman_y + 1, this);
+                }
                 break;
             default:
-                g2d.drawImage(pacman1, pacman_x + 1, pacman_y + 1, this);
+            	if(superPower == 0) {
+            		g2d.drawImage(pacman1, pacman_x + 1, pacman_y + 1, this);
+            	} else {
+            		g2d.drawImage(pacman1_r, pacman_x + 1, pacman_y + 1, this);
+            	}
+                
                 break;
         }
     }
@@ -525,16 +549,33 @@ public class Board extends JPanel implements ActionListener {
 
         switch (pacmanAnimPos) {
             case 1:
-                g2d.drawImage(pacman2down, pacman_x + 1, pacman_y + 1, this);
+            	if(superPower == 0) {
+            		g2d.drawImage(pacman2down, pacman_x + 1, pacman_y + 1, this);
+            	} else {
+            		g2d.drawImage(pacman2down_r, pacman_x + 1, pacman_y + 1, this);
+            	}
                 break;
             case 2:
-                g2d.drawImage(pacman3down, pacman_x + 1, pacman_y + 1, this);
+            	if(superPower == 0) {
+            		g2d.drawImage(pacman3down, pacman_x + 1, pacman_y + 1, this);
+            	} else {
+            		g2d.drawImage(pacman3down_r, pacman_x + 1, pacman_y + 1, this);
+            	}
                 break;
             case 3:
-                g2d.drawImage(pacman4down, pacman_x + 1, pacman_y + 1, this);
+            	if(superPower == 0) {
+            		g2d.drawImage(pacman4down, pacman_x + 1, pacman_y + 1, this);
+            	} else {
+            		g2d.drawImage(pacman4down_r, pacman_x + 1, pacman_y + 1, this);
+            	}
                 break;
             default:
-                g2d.drawImage(pacman1, pacman_x + 1, pacman_y + 1, this);
+            	if(superPower == 0) {
+            		g2d.drawImage(pacman1, pacman_x + 1, pacman_y + 1, this);
+            	} else {
+            		g2d.drawImage(pacman1_r, pacman_x + 1, pacman_y + 1, this);
+            	}
+                
                 break;
         }
     }
@@ -543,16 +584,36 @@ public class Board extends JPanel implements ActionListener {
 
         switch (pacmanAnimPos) {
             case 1:
-                g2d.drawImage(pacman2left, pacman_x + 1, pacman_y + 1, this);
+            	if(superPower == 0) {
+            		g2d.drawImage(pacman2left, pacman_x + 1, pacman_y + 1, this);
+            	} else {
+            		g2d.drawImage(pacman2left_r, pacman_x + 1, pacman_y + 1, this);
+            	}
+                
                 break;
             case 2:
-                g2d.drawImage(pacman3left, pacman_x + 1, pacman_y + 1, this);
+            	if(superPower == 0) {
+            		g2d.drawImage(pacman3left, pacman_x + 1, pacman_y + 1, this);
+            	} else {
+            		g2d.drawImage(pacman3left_r, pacman_x + 1, pacman_y + 1, this);
+            	}
+                
                 break;
             case 3:
-                g2d.drawImage(pacman4left, pacman_x + 1, pacman_y + 1, this);
+            	if(superPower == 0) {
+            		g2d.drawImage(pacman4left, pacman_x + 1, pacman_y + 1, this);
+            	} else {
+            		g2d.drawImage(pacman4left_r, pacman_x + 1, pacman_y + 1, this);
+            	}
+                
                 break;
             default:
-                g2d.drawImage(pacman1, pacman_x + 1, pacman_y + 1, this);
+            	if(superPower == 0) {
+            		g2d.drawImage(pacman1, pacman_x + 1, pacman_y + 1, this);
+            	} else {
+            		g2d.drawImage(pacman1_r, pacman_x + 1, pacman_y + 1, this);
+            	}
+                
                 break;
         }
     }
@@ -561,16 +622,36 @@ public class Board extends JPanel implements ActionListener {
 
         switch (pacmanAnimPos) {
             case 1:
-                g2d.drawImage(pacman2right, pacman_x + 1, pacman_y + 1, this);
+            	if(superPower == 0) {
+            		g2d.drawImage(pacman2right, pacman_x + 1, pacman_y + 1, this);
+            	} else {
+            		g2d.drawImage(pacman2right_r, pacman_x + 1, pacman_y + 1, this);
+            	}
+                
                 break;
             case 2:
-                g2d.drawImage(pacman3right, pacman_x + 1, pacman_y + 1, this);
+            	if(superPower == 0) {
+            		g2d.drawImage(pacman3right, pacman_x + 1, pacman_y + 1, this);
+            	} else {
+            		g2d.drawImage(pacman3right_r, pacman_x + 1, pacman_y + 1, this);
+            	}
+                
                 break;
             case 3:
-                g2d.drawImage(pacman4right, pacman_x + 1, pacman_y + 1, this);
+            	if(superPower == 0) {
+            		g2d.drawImage(pacman4right, pacman_x + 1, pacman_y + 1, this);
+            	} else {
+            		g2d.drawImage(pacman4right_r, pacman_x + 1, pacman_y + 1, this);
+            	}
+                
                 break;
             default:
-                g2d.drawImage(pacman1, pacman_x + 1, pacman_y + 1, this);
+            	if(superPower == 0) {
+            		g2d.drawImage(pacman1, pacman_x + 1, pacman_y + 1, this);
+            	} else {
+            		g2d.drawImage(pacman1_r, pacman_x + 1, pacman_y + 1, this);
+            	}
+                
                 break;
         }
     }
@@ -625,13 +706,15 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void initLevel() {
-    	levelData = nuskaitauLabirinta();
+    	//levelData = nuskaitauLabirinta(map_type); anksciau cia nuskaitydavau labirinto faila
         int i;
         for (i = 0; i < N_BLOCKS * N_BLOCKS; i++) {
             screenData[i] = levelData[i];
         }
-
-        continueLevel();
+        if(isejoPerDesine == false) {
+        	continueLevel();
+        }
+        
     }
 
     private void continueLevel() {
@@ -772,8 +855,19 @@ public class Board extends JPanel implements ActionListener {
                     inGame = true;
                     arPrasidejoZaidimas = true;
                     timeStarted = System.currentTimeMillis();
+                    levelData = nuskaitauLabirinta(1);
                     initGame();
-                } else if(key == 'r' || key == 'R') {
+                } else if(key == 'c' || key == 'C') {
+                	inGame = true;
+                	arPrasidejoZaidimas = true;
+                	timeStarted = System.currentTimeMillis();
+                	levelData = nuskaitauLabirinta(2);
+                	initGame();
+                }
+                
+                
+                
+                else if(key == 'r' || key == 'R') {
                 	//buvo taip:
                 	//new Labirintas().labirintoRedagavimas();
                 	
@@ -830,8 +924,14 @@ public class Board extends JPanel implements ActionListener {
     
     //Failo su labirintu nuskaitymas
     
-    public short[] nuskaitauLabirinta() {
-    	File failas = new File("maps/level_01.txt");
+    public short[] nuskaitauLabirinta(int map_type) {
+    	File failas;  	
+    	if(map_type == 1) {
+    		failas = new File("maps/level_01.txt");
+    	} else {
+    		failas = new File("maps/level_02.txt");
+    	}
+    	
         //String eilute = "";
         short[] labirintas = new short[225];
     	try {

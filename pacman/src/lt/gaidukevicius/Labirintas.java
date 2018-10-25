@@ -58,25 +58,35 @@ public class Labirintas extends JFrame {
 		for (int i = 0; i < 15; i++) {
 			for (int j = 0; j < 15; j++) {
 				JButton btn = new JButton();
-				btn.setText("."); 
-				mygtukai[i][j] = btn;
-				btn.addActionListener(new ActionListener() {
+				if(i == 11 && j == 7) {
+					btn.setText("*");
+					mygtukai[i][j] = btn;
+				} else if(i == 4 && j == 4) {
+					btn.setText("~");
+					mygtukai[i][j] = btn;
+				} else {
+					btn.setText("."); 
+					mygtukai[i][j] = btn;
+					btn.addActionListener(new ActionListener() {
 
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						if(".".equals(btn.getText())) {
-							btn.setText("#");
-						} else if("#".equals(btn.getText())) {
-							btn.setText("*");
-						} else if("*".equals(btn.getText())) {
-							btn.setText("~");
-						} else {
-							btn.setText(".");
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							if(".".equals(btn.getText())) {
+								btn.setText("#");
+							} /*else if("#".equals(btn.getText())) {
+								btn.setText("*");
+							} else if("*".equals(btn.getText())) {
+								btn.setText("~");
+							}*/ else {
+								btn.setText(".");
+							}
+							
 						}
 						
-					}
-					
-				});
+					});
+
+				}
+				
 				pane.add(btn);
 			}
 		}
@@ -105,6 +115,7 @@ public class Labirintas extends JFrame {
 	public void labirintoSuformavimas() {
 		for (int i = 0; i < 15; i++) {
 			for (int j = 0; j < 15; j++) {
+				//cia patikrina jeigu langelyje yra #
 				if("#".equals(mygtukai[i][j].getText())) {
 					levelDataNew[i][j] -= 16;
 				} else {
@@ -119,7 +130,19 @@ public class Labirintas extends JFrame {
 						}
 					}
 				}
-				
+				//cia patikrina, jeigu langelyje yra .
+				if(".".equals(mygtukai[i][j].getText()) || "~".equals(mygtukai[i][j].getText()) || "*".equals(mygtukai[i][j].getText())) {
+					if(j != 14) {
+						if("#".equals(mygtukai[i][j + 1].getText())) {
+							levelDataNew[i][j] += 4;
+						}
+					}
+					if(i != 14) {
+						if("#".equals(mygtukai[i + 1][j].getText())) {
+							levelDataNew[i][j] += 8;
+						}
+					}	
+				}
 				
 				System.out.println(levelDataNew[i][j]);
 			}
