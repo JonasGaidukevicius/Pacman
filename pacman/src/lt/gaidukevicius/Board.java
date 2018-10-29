@@ -920,7 +920,7 @@ public class Board extends JPanel implements ActionListener {
     
     public short[] nuskaitauLabirinta(int map_type) {
     	File failas;  	
-    	System.out.println(map_type);
+    	//System.out.println(map_type);
     	if(map_type == 1) {
     		failas = new File("maps/level_01.txt");
     	} else if(map_type == 2) {

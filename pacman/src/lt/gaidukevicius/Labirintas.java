@@ -1,13 +1,17 @@
 package lt.gaidukevicius;
 
+import java.awt.Color;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -42,7 +46,7 @@ public class Labirintas extends JFrame {
 	public Labirintas() {
 		super();
 		pane = getContentPane();
-		pane.setLayout(new GridLayout(15, 15, 1, 1));
+		pane.setLayout(new GridLayout(15, 15, 0, 0));
 		setTitle("Labirinto redagavimas");
 		setSize(680, 680);
 		setResizable(false);
@@ -54,18 +58,31 @@ public class Labirintas extends JFrame {
 
 	// Siuo metodu sukuriu lenta su mygtukais
 	public void initializeBoard() {
-
+		Image ghost;
+		Image pacman;
+		ghost = new ImageIcon("images/ghost.gif").getImage();
+		pacman = new ImageIcon("images/left1.gif").getImage();
 		for (int i = 0; i < 15; i++) {
 			for (int j = 0; j < 15; j++) {
 				JButton btn = new JButton();
+				btn.setFont(new Font("Arial", Font.BOLD, 16));
 				if(i == 11 && j == 7) {
-					btn.setText("*");
+					btn.setIcon(new ImageIcon(pacman));
+					btn.setBackground(Color.BLACK);
+					btn.setBorder(null);
+					//btn.setText("*");
 					mygtukai[i][j] = btn;
 				} else if(i == 4 && j == 4) {
-					btn.setText("~");
+					btn.setIcon(new ImageIcon(ghost));
+					btn.setBackground(Color.BLACK);
+					btn.setBorder(null);
+					//btn.setText("~");
 					mygtukai[i][j] = btn;
 				} else {
-					btn.setText("."); 
+					btn.setText(".");
+					btn.setBorder(null);
+					btn.setForeground(Color.YELLOW);
+					btn.setBackground(Color.BLACK);
 					mygtukai[i][j] = btn;
 					btn.addActionListener(new ActionListener() {
 
@@ -73,8 +90,12 @@ public class Labirintas extends JFrame {
 						public void actionPerformed(ActionEvent e) {
 							if(".".equals(btn.getText())) {
 								btn.setText("#");
+								btn.setForeground(Color.GREEN);
+								btn.setBackground(Color.GREEN);
 							} else {
 								btn.setText(".");
+								btn.setForeground(Color.YELLOW);
+								btn.setBackground(Color.BLACK);
 							}
 						}
 					});
@@ -136,7 +157,7 @@ public class Labirintas extends JFrame {
 					}	
 				}
 				
-				System.out.println(levelDataNew[i][j]);
+				//System.out.println(levelDataNew[i][j]);
 			}
 		}
 	}
