@@ -1,0 +1,12 @@
+private void initLevel() {
+    	//levelData = nuskaitauLabirinta(map_type); anksciau cia nuskaitydavau labirinto faila
+        
+    	   	
+        for (int i = 0; i < N_BLOCKS * N_BLOCKS; i++) {
+            screenData[i] = levelData[i];  //sita reikia daryti tik data, kai tu pirma karta
+        }
+        if(isejoPerDesine == false) {
+        	continueLevel();
+        }
+        
+    }

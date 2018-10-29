@@ -73,20 +73,12 @@ public class Labirintas extends JFrame {
 						public void actionPerformed(ActionEvent e) {
 							if(".".equals(btn.getText())) {
 								btn.setText("#");
-							} /*else if("#".equals(btn.getText())) {
-								btn.setText("*");
-							} else if("*".equals(btn.getText())) {
-								btn.setText("~");
-							}*/ else {
+							} else {
 								btn.setText(".");
 							}
-							
 						}
-						
 					});
-
-				}
-				
+				}	
 				pane.add(btn);
 			}
 		}
@@ -155,7 +147,7 @@ public class Labirintas extends JFrame {
 		BufferedWriter writer;
 
 		try {
-			writer = new BufferedWriter(new FileWriter("maps/level_02.txt", false));
+			writer = new BufferedWriter(new FileWriter("maps/level_04.txt", false));
 			for (int i = 0; i < 15; i++) {
 				for (int j = 0; j < 15; j++) {
 					writer.append(Short.toString(levelDataNew[i][j]));
@@ -164,7 +156,6 @@ public class Labirintas extends JFrame {
 			}
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

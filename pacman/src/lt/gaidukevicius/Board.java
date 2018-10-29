@@ -95,34 +95,15 @@ public class Board extends JPanel implements ActionListener {
         9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 17, 16, 16, 16, 20
     };*/
 
-    /*private final short levelData[] = {
-    		19,26,26,22, 9,12,19,26,22, 9,12,19,26,26,22,
-    		37,11,14,17,26,26,20,15,17,26,26,20,11,14,37,
-    		17,26,26,20,11, 6,17,26,20, 3,14,17,26,26,20,
-    		21, 3, 6,25,22, 5,21, 7,21, 5,19,28, 3, 6,21,
-    		21, 9, 8,14,21,13,21, 5,21,13,21,11, 8,12,21,
-    		25,18,26,18,24,18,28, 5,25,18,24,18,26,18,28,
-    		 6,21, 7,21, 7,21,11, 8,14,21, 7,21, 7,21,03,
-    		 4,21, 5,21, 5,21,11,10,14,21, 5,21, 5,21, 1,
-    		12,21,13,21,13,21,11,10,14,21,13,21,13,21, 9,
-    		19,24,26,24,26,16,26,18,26,16,26,24,26,24,22,
-    		21, 3, 2, 2, 6,21,15,21,15,21, 3, 2, 2,06,21,
-    		21, 9, 8, 8, 4,17,26, 8,26,20, 1, 8, 8,12,21,
-    		17,26,26,22,13,21,11, 2,14,21,13,19,26,26,20,
-    		37,11,14,17,26,24,22,13,19,24,26,20,11,14,37,
-    		25,26,26,28, 3, 6,25,26,28, 3, 6,25,26,26,28 
-        };*/
-
-
-
-
-
-
     private final int validSpeeds[] = {1, 2, 3, 4, 6, 8};
     private final int maxSpeed = 6;
 
     private int currentSpeed = 3;
     private short[] screenData;
+    private short[] screenDataO; //originalus labirintas centre (esamos situacijos, ne zemelapio nuskaitymas)
+    private short[] screenDataD; //labirintas desineje (esamos situacijos, ne zemelapio nuskaitymas)
+    private short[] screenDataK; //labirintas kaireje (esamos situacijos, ne zemelapio nuskaitymas)
+    
     private Timer timer;
     
     private int superPower; //Jeigu 0 - iprastas, heigu 1 - valgo vaiduoklius
@@ -136,6 +117,9 @@ public class Board extends JPanel implements ActionListener {
     
     private boolean isejoPerDesine = false;
     private boolean isejoPerKaire = false;
+    private boolean yraCentre = false;
+    
+    private boolean customMapGame = false;
     public Board() {
     	
     	//labirinto nuskaitymas
@@ -259,29 +243,16 @@ public class Board extends JPanel implements ActionListener {
         }
     }
     
-    /*private void drawTimer(Graphics2D g) {
-    	 String t; // timer eilutes kintamasis
-    	 t = "Timer: " + timer;
-    	 
-    	 g.setFont(smallFont);
-         g.setColor(new Color(96, 128, 255));
-    	 g.drawString(t, SCREEN_SIZE - 100, SCREEN_SIZE + 16);
-    }*/
-      
-    
-
     private void checkMaze() {
 
         short i = 0;
         boolean finished = true;
 
         while (i < N_BLOCKS * N_BLOCKS && finished) {
-        	
         	//cia pertikrina ar dar like yra tasku nesuvalgytu
             if ((screenData[i] & 48) != 0) {
                 finished = false;
             }
-
             i++;
         }
 
@@ -292,26 +263,26 @@ public class Board extends JPanel implements ActionListener {
             if (N_GHOSTS < MAX_GHOSTS) {
                 N_GHOSTS++;
             }
-
             if (currentSpeed < maxSpeed) {
                 currentSpeed++;
             }
-
             initLevel();
         }
     }
 
     private void death() {
     	 File mirtis = new File("sounds/pacman_death.wav");
+    	 File zuvoVienas = new File("sounds/pacman_eatghost.wav");
         pacsLeft--;
 
         if (pacsLeft == 0) {
             inGame = false;
             playSound(mirtis, 1000);
-            arPrasidejoZaidimas = false;
-            
+            arPrasidejoZaidimas = false;  
         }
-
+        if(pacsLeft > 0) {
+        	playSoundInBackground(zuvoVienas);
+        }
         continueLevel();
     }
 
@@ -320,7 +291,7 @@ public class Board extends JPanel implements ActionListener {
         short i;
         int pos;
         int count;
-
+        File suvalgoVaiduokli = new File("sounds/pacman_eatfruit.wav");
         for (i = 0; i < N_GHOSTS; i++) {
             if (ghost_x[i] % BLOCK_SIZE == 0 && ghost_y[i] % BLOCK_SIZE == 0) {
                 pos = ghost_x[i] / BLOCK_SIZE + N_BLOCKS * (int) (ghost_y[i] / BLOCK_SIZE);
@@ -372,7 +343,6 @@ public class Board extends JPanel implements ActionListener {
                     ghost_dx[i] = dx[count];
                     ghost_dy[i] = dy[count];
                 }
-
             }
 
             ghost_x[i] = ghost_x[i] + (ghost_dx[i] * ghostSpeed[i]); // matyt cia naujos vaiduoklio koordinates nustatomos
@@ -385,15 +355,19 @@ public class Board extends JPanel implements ActionListener {
             if(ghost_y[i] < 0) {
             	ghost_y[i] = 0;
             }
+            if(ghost_x[i] > 336) {
+            	ghost_x[i] = 336;
+            }
+            if(ghost_x[i] < 0) {
+            	ghost_x[i] = 0;
+            }
             
             //cia piesia vaiduokli
             //tai reikia nekviesti sio metodo, jeigu vaiduoklis suvalgytas
-            
             if(ghost_active[i] != 0) {
             	drawGhost(g2d, ghost_x[i] + 1, ghost_y[i] + 1);
             }
-            
-            
+
             //cia patikrina ar susidure vaiduoklis su pacmanu
             
             if(ghost_active[i] != 0) {
@@ -405,6 +379,7 @@ public class Board extends JPanel implements ActionListener {
                     	dying = true;
                     
                     } else {
+                    	playSoundInBackground(suvalgoVaiduokli);
                     	ghost_active[i] = 0;
                     } 		
                 }
@@ -424,7 +399,6 @@ public class Board extends JPanel implements ActionListener {
         
         //mano prideta garso saltinis
         File valgau = new File("sounds/pacman_chomp.wav");
-		
 
         if (req_dx == -pacmand_x && req_dy == -pacmand_y) {
             pacmand_x = req_dx;
@@ -440,7 +414,7 @@ public class Board extends JPanel implements ActionListener {
             //atrodo, kad cia valgomi taskai
             if ((ch & 16) != 0) {
                 screenData[pos] = (short) (ch & 15);
-                playSound(valgau, 20000); // cia sugroja muzikyte, kai suvalgo taska
+                playSoundInBackground(valgau);
                 score++;
             }
 
@@ -478,18 +452,33 @@ public class Board extends JPanel implements ActionListener {
         
         //cia paziurima ar isejo per desini sona
         if(pacman_x > 336) {
-        	//kol kas padarau, kad atsoktu per viena langeli
-        	//pacman_x = 336 - 24;
-        	
         	pacman_x = 0;
-        	//turetu cia dabar uzkrauti nauja labirinta
-        	//initLevel() netinka, nes ten suteikia pradines pacmano koordinates
-        	//reikia savo initLevel() funkcijos
-        	isejoPerDesine = true;
-        	initLevel();
+        	if(isejoPerKaire == true) {
+        		isejoPerKaire = false;
+        		yraCentre = true;
+        		screenDataK = screenData;
+        		screenData = screenDataO;
+        	} else {
+        		isejoPerDesine = true;
+            	screenDataO = screenData;
+            	screenData = screenDataD;
+        	}
         }
         
-        
+        if(pacman_x < 0) {
+        	pacman_x = 336;
+        	if(isejoPerDesine == true) {
+        		isejoPerDesine = false;
+        		yraCentre = true;
+        		screenDataD = screenData;
+        		screenData = screenDataO;
+        	} else {
+        		isejoPerKaire = true;
+        		screenDataO = screenData;
+        		screenData = screenDataK;
+        	}
+        }
+       
         //Tikrinu ar jau praejo laiko, kad isjungti super Power rezima
         if(System.currentTimeMillis() - superTimer > 10000) {
         	superPower = 0;
@@ -696,25 +685,31 @@ public class Board extends JPanel implements ActionListener {
     }
 
     private void initGame() {
-
-        pacsLeft = 2; // cia nusistato packamnu skaicius
+    	File begin = new File("sounds/pacman_beginning.wav");
+        pacsLeft = 3; // cia nusistato packamnu skaicius
         score = 0;
         initLevel();
         N_GHOSTS = 2;  //buvo 6// cia nusistato vaiduokliu skaicius
-        currentSpeed = 3; // buvo 3 // cia nusistaot greitis
-        
+        currentSpeed = 3; // buvo 3 // cia nustatimas greitis
+        if(arPrasidejoZaidimas == true) {
+        	playSoundInBackground(begin);
+        }
     }
 
     private void initLevel() {
-    	//levelData = nuskaitauLabirinta(map_type); anksciau cia nuskaitydavau labirinto faila
-        int i;
-        for (i = 0; i < N_BLOCKS * N_BLOCKS; i++) {
-            screenData[i] = levelData[i];
-        }
-        if(isejoPerDesine == false) {
-        	continueLevel();
-        }
-        
+    	if(customMapGame == true) {
+    		levelData = nuskaitauLabirinta(4);
+    		screenData = levelData;
+    	} else {
+    		levelData = nuskaitauLabirinta(1);
+    		screenData = levelData;
+    		screenDataO = screenData;
+    		levelData = nuskaitauLabirinta(2);
+    		screenDataD = levelData;
+    		levelData = nuskaitauLabirinta(3);
+    		screenDataK = levelData;
+    	}
+    	continueLevel();
     }
 
     private void continueLevel() {
@@ -737,7 +732,6 @@ public class Board extends JPanel implements ActionListener {
             if (random > currentSpeed) {
                 random = currentSpeed;
             }
-
             ghostSpeed[i] = validSpeeds[random];
         }
 
@@ -820,8 +814,7 @@ public class Board extends JPanel implements ActionListener {
 
         @Override
         public void keyPressed(KeyEvent e) {
-
-            int key = e.getKeyCode();
+        	int key = e.getKeyCode();
 
             if (inGame) {
                 if (key == KeyEvent.VK_LEFT) {
@@ -855,34 +848,23 @@ public class Board extends JPanel implements ActionListener {
                     inGame = true;
                     arPrasidejoZaidimas = true;
                     timeStarted = System.currentTimeMillis();
-                    levelData = nuskaitauLabirinta(1);
+                    //levelData = nuskaitauLabirinta(1);
                     initGame();
                 } else if(key == 'c' || key == 'C') {
                 	inGame = true;
                 	arPrasidejoZaidimas = true;
                 	timeStarted = System.currentTimeMillis();
-                	levelData = nuskaitauLabirinta(2);
+                	//levelData = nuskaitauLabirinta(2);
+                	customMapGame = true;
                 	initGame();
-                }
-                
-                
-                
-                else if(key == 'r' || key == 'R') {
-                	//buvo taip:
-                	//new Labirintas().labirintoRedagavimas();
-                	
-                	//cia naujas **************************
+                } else if(key == 'r' || key == 'R') {
                 	SwingUtilities.invokeLater(new Runnable() {
 
             			@Override
             			public void run() {
             				new Labirintas();
-            				
             			}
-            			
             		});
-            		
-                	//************************************
                 }
             }
         }
@@ -922,17 +904,33 @@ public class Board extends JPanel implements ActionListener {
 		}
 	}
     
+    public void playSoundInBackground(File garsas) {
+		try {
+			Clip clip = AudioSystem.getClip();
+			clip.open(AudioSystem.getAudioInputStream(garsas));
+			clip.loop(0);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+    
+    
     //Failo su labirintu nuskaitymas
     
     public short[] nuskaitauLabirinta(int map_type) {
     	File failas;  	
+    	System.out.println(map_type);
     	if(map_type == 1) {
     		failas = new File("maps/level_01.txt");
-    	} else {
+    	} else if(map_type == 2) {
     		failas = new File("maps/level_02.txt");
+    	} else if(map_type == 3) {
+    		failas = new File("maps/level_03.txt");
+    	} else {
+    		failas = new File("maps/level_04.txt");
     	}
     	
-        //String eilute = "";
         short[] labirintas = new short[225];
     	try {
         	Scanner input = new Scanner(failas);
@@ -940,18 +938,9 @@ public class Board extends JPanel implements ActionListener {
         		labirintas[i] = input.nextByte();
         	}
         	input.close();
-        	
-        	        	
-        	/*while(input.hasNextLine()){
-        		eilute = input.nextLine();
-        		input.nextByte();
-        		input.close();
-        	}*/
         } catch (Exception e) {
         		e.printStackTrace();
         }
 		return labirintas;
     }
-    
-    
 } 
