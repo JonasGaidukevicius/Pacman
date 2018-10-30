@@ -25,7 +25,6 @@ public class Labirintas extends JFrame {
 	private JMenuBar menuBar;
 	private JMenu menu;
 	private JMenuItem save;
-	private String[] variantai = { ".", "#", "*", "~" };
 	private JButton[][] mygtukai = new JButton[15][15];
 	private short levelDataNew[][] = { { 19, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22 },
 			{ 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20 },
@@ -70,13 +69,11 @@ public class Labirintas extends JFrame {
 					btn.setIcon(new ImageIcon(pacman));
 					btn.setBackground(Color.BLACK);
 					btn.setBorder(null);
-					//btn.setText("*");
 					mygtukai[i][j] = btn;
 				} else if(i == 4 && j == 4) {
 					btn.setIcon(new ImageIcon(ghost));
 					btn.setBackground(Color.BLACK);
 					btn.setBorder(null);
-					//btn.setText("~");
 					mygtukai[i][j] = btn;
 				} else {
 					btn.setText(".");

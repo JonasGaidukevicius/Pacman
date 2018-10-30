@@ -37,11 +37,9 @@ public class Board extends JPanel implements ActionListener {
 
     private Dimension d;
     private final Font smallFont = new Font("Helvetica", Font.BOLD, 14);
-
     private Image ii;
     private final Color dotColor = new Color(192, 192, 0);
     private Color mazeColor;
-
     private boolean inGame = false;
     private boolean dying = false;
 
@@ -56,11 +54,10 @@ public class Board extends JPanel implements ActionListener {
     private int pacAnimCount = PAC_ANIM_DELAY;
     private int pacAnimDir = 1;
     private int pacmanAnimPos = 0;
-    private int N_GHOSTS = 1; //buvo 6
+    private int N_GHOSTS = 6; //buvo 6
     private int pacsLeft, score;
     private int[] dx, dy;
     private int[] ghost_x, ghost_y, ghost_dx, ghost_dy, ghostSpeed;
-    
 
     private Image ghost;
     private Image pacman1, pacman2up, pacman2left, pacman2right, pacman2down;
@@ -122,10 +119,6 @@ public class Board extends JPanel implements ActionListener {
     private boolean customMapGame = false;
     public Board() {
     	
-    	//labirinto nuskaitymas
-    	//levelData = nuskaitauLabirinta();
-        //System.out.println(levelData[0] + " " + levelData[1]); //Testuoju
-    	
         loadImages();
         initVariables();
         initBoard();
@@ -143,9 +136,7 @@ public class Board extends JPanel implements ActionListener {
 
     private void initVariables() {
 
-    	
-    	//kaip cia aprasomi kintamieji? Koks tai tipas?
-        screenData = new short[N_BLOCKS * N_BLOCKS];
+    	screenData = new short[N_BLOCKS * N_BLOCKS];
         mazeColor = new Color(5, 100, 5);
         d = new Dimension(400, 400);
         ghost_x = new int[MAX_GHOSTS];
@@ -161,7 +152,6 @@ public class Board extends JPanel implements ActionListener {
         timer.start();
         superPower = 0;
         superTimer = 0;
-       
         timeForDisplay = new SimpleDateFormat("mm:ss");
     }
 
@@ -230,7 +220,6 @@ public class Board extends JPanel implements ActionListener {
         g.setFont(smallFont);
         g.setColor(new Color(96, 128, 255));
         s = "Score: " + score;
-        //System.out.println("Ar jis visa laika spausdina taskus ar tik tada, kai atsinaujina?"); - visa laika
         tf = timeForDisplay.format(System.currentTimeMillis() - timeStarted);
         t = "Timer: ";
         if(arPrasidejoZaidimas) {
@@ -362,14 +351,11 @@ public class Board extends JPanel implements ActionListener {
             	ghost_x[i] = 0;
             }
             
-            //cia piesia vaiduokli
-            //tai reikia nekviesti sio metodo, jeigu vaiduoklis suvalgytas
             if(ghost_active[i] != 0) {
             	drawGhost(g2d, ghost_x[i] + 1, ghost_y[i] + 1);
             }
 
             //cia patikrina ar susidure vaiduoklis su pacmanu
-            
             if(ghost_active[i] != 0) {
             	if (pacman_x > (ghost_x[i] - 12) && pacman_x < (ghost_x[i] + 12)
                         && pacman_y > (ghost_y[i] - 12) && pacman_y < (ghost_y[i] + 12)
@@ -397,7 +383,6 @@ public class Board extends JPanel implements ActionListener {
         int pos;
         short ch;
         
-        //mano prideta garso saltinis
         File valgau = new File("sounds/pacman_chomp.wav");
 
         if (req_dx == -pacmand_x && req_dy == -pacmand_y) {
@@ -411,7 +396,7 @@ public class Board extends JPanel implements ActionListener {
             pos = pacman_x / BLOCK_SIZE + N_BLOCKS * (int) (pacman_y / BLOCK_SIZE); //panasu, kad cia apsiskaiciuoj kita pacmano pozicija
             ch = screenData[pos];
             
-            //atrodo, kad cia valgomi taskai
+            //cia suvalgomi taskai
             if ((ch & 16) != 0) {
                 screenData[pos] = (short) (ch & 15);
                 playSoundInBackground(valgau);
@@ -602,7 +587,7 @@ public class Board extends JPanel implements ActionListener {
             	} else {
             		g2d.drawImage(pacman1_r, pacman_x + 1, pacman_y + 1, this);
             	}
-                
+          
                 break;
         }
     }
@@ -686,10 +671,10 @@ public class Board extends JPanel implements ActionListener {
 
     private void initGame() {
     	File begin = new File("sounds/pacman_beginning.wav");
-        pacsLeft = 3; // cia nusistato packamnu skaicius
+        pacsLeft = 3; // cia nusistato packamno gyvybiu skaicius
         score = 0;
         initLevel();
-        N_GHOSTS = 2;  //buvo 6// cia nusistato vaiduokliu skaicius
+        N_GHOSTS = 3;  //buvo 6// cia nusistato vaiduokliu skaicius
         currentSpeed = 3; // buvo 3 // cia nustatimas greitis
         if(arPrasidejoZaidimas == true) {
         	playSoundInBackground(begin);
@@ -717,7 +702,6 @@ public class Board extends JPanel implements ActionListener {
         short i;
         int dx = 1;
         int random;
-        //timeStarted = System.currentTimeMillis(); // cia uzfiksavau, kada prasideda laiko atskaita
         
         for (i = 0; i < N_GHOSTS; i++) {
 
@@ -777,8 +761,6 @@ public class Board extends JPanel implements ActionListener {
         pacman2right_r = new ImageIcon("images/right1_r.gif").getImage();
         pacman3right_r = new ImageIcon("images/right2_r.gif").getImage();
         pacman4right_r = new ImageIcon("images/right3_r.gif").getImage();
-        
-
     }
 
     @Override
@@ -848,13 +830,11 @@ public class Board extends JPanel implements ActionListener {
                     inGame = true;
                     arPrasidejoZaidimas = true;
                     timeStarted = System.currentTimeMillis();
-                    //levelData = nuskaitauLabirinta(1);
                     initGame();
                 } else if(key == 'c' || key == 'C') {
                 	inGame = true;
                 	arPrasidejoZaidimas = true;
                 	timeStarted = System.currentTimeMillis();
-                	//levelData = nuskaitauLabirinta(2);
                 	customMapGame = true;
                 	initGame();
                 } else if(key == 'r' || key == 'R') {
